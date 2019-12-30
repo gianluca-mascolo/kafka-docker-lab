@@ -1,0 +1,50 @@
+version: '3.7'
+services:
+  zookeeper:
+    container_name: zookeeper
+    image: zoocker
+    environment:
+      TERM: xterm
+    restart: "no"
+    volumes:
+     - type: bind
+       source: ./configs
+       target: /configs
+       read_only: true
+    ports:
+     - "2181:2181"
+    networks:
+     kafka_net:
+      aliases:
+       - zook00
+    build:
+     context: ./zoocker
+     args:
+      zooversion: 3.5.6
+  broker:
+    container_name: broker
+    image: brocker
+    restart: "no"
+    volumes:
+     - type: bind
+       source: ./configs
+       target: /configs
+       read_only: true
+    environment:
+      TERM: xterm
+    ports:
+     - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+     kafka_net:
+      aliases:
+       - brok00
+    build:
+     context: ./brocker
+     args:
+      kafkaversion: 2.4.0
+networks:
+  kafka_net:
+    driver: bridge
+
